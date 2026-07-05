@@ -1,0 +1,54 @@
+# 부동산경매 블로그 자동화 파이프라인
+
+키워드 하나만 입력하면, 검색의도 분석 → 근거(법령·판례·법원경매 실무자료) 수집 → 본문 작성 → 품질 검사 → 이미지 생성 → 네이버 에디터용 HTML 변환까지 단계별 에이전트가 순서대로 처리하고, 사람은 마지막 검수와 발행만 담당하는 구조입니다.
+
+각 단계는 독립적인 프롬프트(에이전트)로 분리되어 있어서, 문제가 생긴 단계만 고치면 되고 다른 주제(경매 외 부동산 매매, 세금 등)에도 재사용할 수 있습니다.
+
+## 파이프라인
+
+```
+키워드 입력 (data/keyword-input.example.json)
+  → 01 검색 분석 에이전트         (prompts/01_search_analysis.md)
+  → 02 근거 수집 에이전트         (prompts/02_evidence_collection.md)
+  → 03 본문 작성 에이전트         (prompts/03_draft_writing.md)
+  → 04 품질 검사 에이전트         (prompts/04_quality_check.md)
+  → 05 이미지 생성 에이전트       (prompts/05_image_generation.md)
+  → 06 HTML 변환 에이전트         (prompts/06_html_conversion.md, scripts/md_to_naver_html.py)
+  → 사람: 최종 검수 후 네이버 블로그 붙여넣기
+```
+
+## 폴더 구조
+
+```
+prompts/   각 단계별 에이전트 프롬프트 템플릿
+data/      키워드 입력 파일, 근거 수집 결과(법령/절차/체크리스트 등)
+drafts/    완성된 마크다운 초안
+images/    이미지 생성 프롬프트 결과물이 들어갈 자리 (자리표시자)
+html/      네이버 에디터에 붙여넣기용 최종 HTML
+scripts/   md_to_naver_html.py — 마크다운 초안을 네이버 붙여넣기용 HTML로 변환
+```
+
+## 부동산경매 특화 지점 (02 근거 수집 단계)
+
+일반 부동산 글은 실거래가/시세가 핵심 근거지만, 경매 글은 다음 근거가 우선입니다.
+
+- **경매 절차/법령**: 민사집행법상 매각 절차, 매각기일, 매각허가결정, 인도명령 등
+- **권리분석 자료**: 등기부등본상 권리관계, 말소기준권리, 임차인 대항력·확정일자
+- **법원경매 공고 자료**: 감정가, 최저매각가격, 입찰보증금 비율, 매각물건명세서, 현황조사서
+
+이 근거가 확인되지 않으면 본문 작성 단계로 숫자나 단정적 문장을 넘기지 않는 것이 원칙입니다.
+
+## 예시 결과물
+
+- `data/keyword-input.example.json` — 입력 예시 (`경매 입찰 초보자 가이드`)
+- `data/2026-07-05-auction-bidding-beginner-guide.evidence.md` — 근거 수집 단계 산출물
+- `drafts/2026-07-05-auction-bidding-beginner-guide.md` — 완성된 마크다운 초안
+- `html/2026-07-05-auction-bidding-beginner-guide.html` — 네이버 붙여넣기용 HTML (스크립트로 생성)
+
+## HTML 변환 스크립트 사용법
+
+```
+python3 scripts/md_to_naver_html.py drafts/<파일명>.md html/<파일명>.html
+```
+
+마크다운의 제목(`#`/`##`), 목록(`-`/`1.`), 굵게(`**`), 이미지 삽입 위치 표시(`[[IMAGE: 설명]]`), 해시태그 줄을 네이버 에디터에 붙여넣었을 때 문단·이미지 위치가 깨지지 않는 인라인 스타일 HTML로 바꿔줍니다.
