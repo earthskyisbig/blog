@@ -1,0 +1,8 @@
+{
+  "keyword": "낙찰 후 명도(인도명령) 절차 가이드",
+  "category": "부동산경매",
+  "target_reader": "이미 낙찰은 받았지만 점유자를 어떻게 내보내야 할지 모르는 초보 낙찰자",
+  "tone": "쉽고 차분한 설명, 과장 없는 신뢰감 있는 톤",
+  "evidence_needed": ["경매_절차_법령", "권리분석"],
+  "series": "경매 입찰 초보자 가이드 (data/keyword-input.example.json) 후속편"
+}
